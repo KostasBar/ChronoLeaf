@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ChronoLeaf Dev</title>
+  <style>
+    #app { width: 800px; height: 120px; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module">
+    // import directly from your TS source
+    import { Timeline } from '/src/core/Timeline.ts';
+    const items = [
+      { title: 'Start',  start: new Date('2020-01-01') },
+      { title: 'Middle', start: new Date('2020-06-15') },
+      { title: 'Today',  start: new Date() }
+    ];
+    new Timeline(items, { mode: 'slider' })
+      .render(document.getElementById('app'));
+  </script>
+</body>
+</html>

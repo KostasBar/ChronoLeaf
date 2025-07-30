@@ -14,6 +14,15 @@ export interface ITimelineConfig {
   language?: string;
   customRenderer?: (item: TimelineItem) =>
     HTMLElement | SVGElement | DocumentFragment | string;
+
+  /** Called when the user clicks on an event. */
+  onItemClick?: (item: TimelineItem, event: MouseEvent) => void;
+
+  /** Called when the user hovers over an event. */
+  onItemHover?: (item: TimelineItem, event: MouseEvent) => void;
+
+  /** Called whenever the zoom/pan transform changes. */
+  onRangeChange?: (domain: [Date, Date]) => void;
 }
 
 export type TimelineItem = {
@@ -30,5 +39,14 @@ export type Background = {
   source: string;
   overlayColor?: string;
 };
+
+export interface ThemeConfig {
+  name?: string;
+  primaryColor?: string;
+  backgroundColor?: string;
+  font?: string;
+  borderRadius?: string;
+  // add any other CSS vars you want to expose…
+}
 
 export type TimelineMode = 'slider' | 'vertical' | 'grid';

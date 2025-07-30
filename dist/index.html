@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<div id="app" style="width:800px; height:120px;"></div>
+<script type="module">
+  import { Timeline } from '../dist/chrono-leaf.es.js';
+
+  const items = [
+    { title: 'Start',    start: new Date('2020-01-01') },
+    { title: 'Middle',   start: new Date('2020-06-15') },
+    { title: 'Today',    start: new Date() }
+  ];
+
+  const tl = new Timeline(items, { mode: 'slider' });
+  tl.render(document.getElementById('app'));
+</script>
+
+</body>
+</html>
