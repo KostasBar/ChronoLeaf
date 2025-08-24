@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
   <style>
-    
+    html, body, .container {
+    height: 100%;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+} 
   </style>
 <body>
-<div id="app" style="width:800px; height:150px; border:1px solid red;"></div>
-
+<div class="container" >
+  <div id="app" style="width:850px; height:180px; border:1px solid red;"></div>
+</div>
+<!-- 
 <div id="app1" style="width:200px; height:1000px;"></div>
-<div id="app2" style="width:800px; min-height:300px;"></div>
+<div id="app2" style="width:800px; min-height:300px;"></div> -->
 <script type="module">
   import { Timeline } from '../dist/chrono-leaf.es.js';
 
@@ -16,8 +26,21 @@
     { title: 'Two',   start: new Date('2021-06-15') },
     { title: 'Three',   start: new Date('2022-06-15') },
     { title: 'Four',   start: new Date('2023-06-15') },
-    { title: 'lorem',   start: new Date('2024-06-15') },
-    { title: 'Ipsum',   start: new Date('2020-10-15') },
+    { title: 'lorem',   start: new Date('2026-06-15') },
+    { title: 'lorem',   start: new Date('2025-12-15') },
+    { title: 'lorem',   start: new Date('2025-08-15') },
+    { title: 'lorem',   start: new Date('2015-06-15') },
+    { title: 'lorem',   start: new Date('2023-06-15') },
+    { title: 'lorem',   start: new Date('2024-03-02') },
+    { title: 'Ipsum',   start: new Date('2020-11-04') },
+    { title: 'blabla',   start: new Date('2022-09-15') },
+        { title: 'lorem',   start: new Date('2026-06-15') },
+    { title: 'lorem',   start: new Date('2025-12-16') },
+    { title: 'lorem',   start: new Date('2026-08-15') },
+    { title: 'lorem',   start: new Date('2015-10-15') },
+    { title: 'lorem',   start: new Date('2023-05-25') },
+    { title: 'lorem',   start: new Date('2024-03-22') },
+    { title: 'Ipsum',   start: new Date('2020-01-04') },
     { title: 'blabla',   start: new Date('2022-09-15') },
     { title: 'test',   start: new Date('2024-01-15') },
     { title: 'more test',   start: new Date('2020-04-15') },
@@ -27,24 +50,28 @@
     { title: 'Today',    start: new Date() }
   ];
 
-new Timeline(items, {
-    mode: 'slider',
-    onItemClick: (item) => console.log('Clicked', item),
-    onRangeChange: ([from, to]) => console.log('Range now from', from, 'to', to)
-  }).render(document.getElementById('app'));
+// new Timeline(items, {
+//     mode: 'slider',
+//     onItemClick: (item) => console.log('Clicked', item),
+//     onRangeChange: ([from, to]) => console.log('Range now from', from, 'to', to)
+//   }).render(document.getElementById('app'));
 
-  const tl1 = new Timeline(items, { mode: 'vertical' });
-  tl1.render(document.getElementById('app1'));
+new Timeline(items).render(document.getElementById('app'));
 
-   new Timeline(items, {
-    mode: 'grid',
-    theme: {
-      primaryColor: '#e91e63',
-      backgroundColor: '#f0f0f0',
-      font: '"Comic Sans MS", cursive',
-      borderRadius: '10px'
-    }
-  }).render(document.getElementById('app2'));
+
+
+  // const tl1 = new Timeline(items, { mode: 'vertical' });
+  // tl1.render(document.getElementById('app1'));
+
+  //  new Timeline(items, {
+  //   mode: 'grid',
+  //   theme: {
+  //     primaryColor: '#e91e63',
+  //     backgroundColor: '#f0f0f0',
+  //     font: '"Comic Sans MS", cursive',
+  //     borderRadius: '10px'
+  //   }
+  // }).render(document.getElementById('app2'));
 </script>
 
 </body>
