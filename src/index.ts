@@ -7,52 +7,56 @@ if (!document.getElementById(GLOBAL_STYLE_ID)) {
   s.id = GLOBAL_STYLE_ID;
      s.textContent = `
      /* Theme classes just set variables */
-     .tl-theme-light { 
+      .tl-theme-light {
        --tl-primary-color: #4285f4;
        --tl-background-color: #fff;
        --tl-font: system-ui, sans-serif;
        --tl-border-radius: 4px;
        --tl-tooltip-bg: rgba(0,0,0,0.7);
        --tl-tooltip-color: #fff;
-+      /* new: fine-grained colors with sensible fallbacks */
-+      --tl-axis-color: var(--tl-primary-color);
-+      --tl-tick-color: var(--tl-primary-color);
-+      --tl-text-color: #1f2937; /* slate-800 */
-+      --tl-accent-color: var(--tl-primary-color);
-     }
-     .tl-theme-dark {
-       --tl-primary-color: #8ab4f8;
-       --tl-background-color: #222;
-       --tl-font: system-ui, sans-serif;
-       --tl-border-radius: 4px;
-       --tl-tooltip-bg: rgba(255,255,255,0.85);
-       --tl-tooltip-color: #000;
-+      /* new */
-+      --tl-axis-color: var(--tl-primary-color);
-+      --tl-tick-color: var(--tl-primary-color);
-+      --tl-text-color: #e5e7eb; /* gray-200 */
-+      --tl-accent-color: var(--tl-primary-color);
-     }
+       --tl-card-bg: rgba(0,0,0,0.04);
+       --tl-card-border: rgba(0,0,0,0.15);
+       --tl-card-radius: 10px;
+       --tl-card-shadow: 0 2px 8px rgba(0,0,0,0.12);
+       }
+       .tl-theme-dark {
+        --tl-primary-color: #8ab4f8;
+        --tl-background-color: #222;
+        --tl-font: system-ui, sans-serif;
+        --tl-border-radius: 4px;
+        --tl-tooltip-bg: rgba(255,255,255,0.85);
+        --tl-tooltip-color: #000;
+        --tl-card-bg: rgba(255,255,255,0.06);
+        --tl-card-border: rgba(255,255,255,0.18);
+        --tl-card-radius: 10px;
+        --tl-card-shadow: 0 2px 10px rgba(0,0,0,0.35);
+      }
 
      /* Base container styles */
      .tl-container, .tl-grid {
        background: var(--tl-background-color);
        font-family: var(--tl-font);
        border-radius: var(--tl-border-radius);
--      color: inherit;
-+      color: var(--tl-text-color, inherit);
+      color: inherit;
+       color: var(--tl-text-color, inherit);
      }
+  .tl-container svg foreignObject.tl-label-video {
+    overflow: visible;
+  }
+  .tl-container svg .tl-label-text {
+    user-select: none;
+  }
 
-+    /* Axis & SVG text defaults (renderer reads these vars) */
-+    .tl-container svg .domain,
-+    .tl-container svg .tick line {
-+      stroke: var(--tl-axis-color, var(--tl-primary-color, #4285f4));
-+    }
-+    .tl-container svg .tick text {
-+      fill: var(--tl-tick-color, var(--tl-primary-color, #4285f4));
-+      font-family: var(--tl-font);
-+    }
-+
+     /* Axis & SVG text defaults (renderer reads these vars) */
+     .tl-container svg .domain,
+     .tl-container svg .tick line {
+       stroke: var(--tl-axis-color, var(--tl-primary-color, #4285f4));
+     }
+     .tl-container svg .tick text {
+       fill: var(--tl-tick-color, var(--tl-primary-color, #4285f4));
+       font-family: var(--tl-font);
+     }
+ 
      /* Tooltip */
      .tl-tooltip {
        background: var(--tl-tooltip-bg);

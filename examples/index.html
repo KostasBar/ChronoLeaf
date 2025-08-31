@@ -11,9 +11,9 @@
     justify-content: center;
 } 
   </style>
-<body>
+<body style="background-color: #4A4A4A;">
 <div class="container" >
-  <div id="app" style="width:850px; height:180px; border:1px solid red;"></div>
+  <div id="app" style="width:1150px; height:480px; border:1px solid red;"></div>
 </div>
 <!-- 
 <div id="app1" style="width:200px; height:1000px;"></div>
@@ -21,57 +21,128 @@
 <script type="module">
   import { Timeline } from '../dist/chrono-leaf.es.js';
 
-  const items = [
-    { title: 'Start',    start: new Date('2020-01-01') }, 
-    { title: 'Two',   start: new Date('2021-06-15') },
-    { title: 'Three',   start: new Date('2022-06-15') },
-    { title: 'Four',   start: new Date('2023-06-15') },
-    { title: 'lorem',   start: new Date('2026-06-15') },
-    { title: 'lorem',   start: new Date('2025-12-15') },
-    { title: 'lorem',   start: new Date('2025-08-15') },
-    { title: 'lorem',   start: new Date('2015-06-15') },
-    { title: 'lorem',   start: new Date('2023-06-15') },
-    { title: 'lorem',   start: new Date('2024-03-02') },
-    { title: 'Ipsum',   start: new Date('2020-11-04') },
-    { title: 'blabla',   start: new Date('2022-09-15') },
-        { title: 'lorem',   start: new Date('2026-06-15') },
-    { title: 'lorem',   start: new Date('2025-12-16') },
-    { title: 'lorem',   start: new Date('2026-08-15') },
-    { title: 'lorem',   start: new Date('2015-10-15') },
-    { title: 'lorem',   start: new Date('2023-05-25') },
-    { title: 'lorem',   start: new Date('2024-03-22') },
-    { title: 'Ipsum',   start: new Date('2020-01-04') },
-    { title: 'blabla',   start: new Date('2022-09-15') },
-    { title: 'test',   start: new Date('2024-01-15') },
-    { title: 'more test',   start: new Date('2020-04-15') },
-    { title: 'all the test',   start: new Date('2020-07-15') },
-    { title: 'almost there',   start: new Date('2020-08-15') },
-    { title: 'Middle',   start: new Date('2020-06-15') },
-    { title: 'Today',    start: new Date() }
-  ];
+  // const items = [
+  //   { title: 'Start',    start: new Date('2020-01-01') }, 
+  //  // { title: 'Two',   start: new Date('2021-06-15') },
+  //   // { title: 'Three',   start: new Date('2022-06-15') },
+  //   { title: 'Four',   start: new Date('2023-06-15') },
+  //   { title: 'lorem',   start: new Date('2026-06-15') },
+  //   { title: 'lorem',   start: new Date('2025-12-15') },
+  //   { title: 'lorem',   start: new Date('2025-08-15') },
+  //   { title: 'lorem',   start: new Date('2015-06-15') },
+  //   { title: 'lorem',   start: new Date('2023-06-15') },
+  //   { title: 'lorem',   start: new Date('2024-03-02') },
+  //   { title: 'Ipsum',   start: new Date('2020-11-04') },
+  //   { title: 'blabla',   start: new Date('2022-09-15') },
+  //       { title: 'lorem',   start: new Date('2026-06-15') },
+  //   { title: 'lorem',   start: new Date('2025-12-16') },
+  //   { title: 'lorem',   start: new Date('2026-08-15') },
+  //   { title: 'lorem',   start: new Date('2015-10-15') },
+  //   { title: 'lorem',   start: new Date('2023-05-25') },
+  //   { title: 'lorem',   start: new Date('2024-03-22') },
+  //   { title: 'Ipsum',   start: new Date('2020-01-04') },
+  //   { title: 'blabla',   start: new Date('2022-09-15') },
+  //   { title: 'test',   start: new Date('2024-01-15') },
+  //   { title: 'more test',   start: new Date('2020-04-15') },
+  //   { title: 'all the test',   start: new Date('2020-07-15') },
+  //   { title: 'almost there',   start: new Date('2020-08-15') },
+  //   { title: 'Middle',   start: new Date('2020-06-15') },
+  //   { title: 'Today',    start: new Date() },
+  //     { title: 'Start', start: new Date('2020-01-01'), label: { kind: 'text', text: 'Start' } },
+  // { title: 'Logo',  start: new Date('2021-06-15'), label: { kind: 'image', src: '.\\assets\\logo.png', height: 24, alt: 'Logo' } },
+  // { title: 'Clip',  start: new Date('2022-06-15'), label: { kind: 'video', src: '.\\assets\\clip.mp4', width: 72, height: 40, muted: true, autoplay: false, controls: true } },
+  // { title: 'Plain text fallback', start: new Date('2023-06-15') } // no label → uses title as text
+  // ];
+
+// const items = [
+//   {
+//     title: 'Earth',
+//     start: new Date('2021-06-15'),
+//     label: {
+//       kind: 'video',
+//       src: '.\\assets\\clip.mp4',
+//       fit: 'cover',        // fill card
+//       zoom: 2.5,          // trim tiny letterbox bars
+//       muted: true,         // (redundant; we set it by default)
+//       autoplay: true,      // (redundant; defaulted)
+//       loop: true           // (redundant; defaulted)
+//     }
+//   },
+//   {
+//     title: 'Donut',
+//     start: new Date('2022-03-01'),
+//     label: {
+//       kind: 'image',
+//       src: '.\\assets\\logo.png',
+//       fit: 'cover',        // fill card
+//       zoom: 1.0            // no extra zoom
+//     }
+//   },
+//   {
+//     title: 'blabla',
+//     start: new Date('2023-04-01'),
+//     label: { kind: 'text', text: 'blabla' },
+//     background: { type: 'color', source: '#FF0000', overlayColor: '#FF0000' }
+//   }
+// ];
 
 // new Timeline(items, {
-//     mode: 'slider',
-//     onItemClick: (item) => console.log('Clicked', item),
-//     onRangeChange: ([from, to]) => console.log('Range now from', from, 'to', to)
-//   }).render(document.getElementById('app'));
+//   mode: 'slider',
+//   // uniform portrait card size
+//   cardWidth: 140,
+//   cardHeight: 200,
+//   enforceUniformCardSize: true,
+//   hideOverlappingLabels: true,
+//   axisStrategy: 'time',
+//   // canvasBackground: { kind: 'color', value: '#0b1220' }, // dark navy
+//   baselineY: 300
+// }).render(document.getElementById('app'));
 
-new Timeline(items).render(document.getElementById('app'));
+const items = [
+  {
+    title: 'Earth',
+    start: new Date('2021-06-15'),
+    overlayColor: 'rgba(0,0,0,0.25)',   // ← tint the video
+    label: {
+      kind: 'video',
+      src: '.\\assets\\clip.mp4',
+      fit: 'cover',        // fill card
+      zoom: 2.5,          // trim tiny letterbox bars
+      muted: true,         // (redundant; we set it by default)
+      autoplay: true,      // (redundant; defaulted)
+      loop: true           // (redundant; defaulted)
+    }
+  },
+  {
+    title: 'Donut',
+    start: new Date('2022-03-01'),
+    overlayColor: '#FF00AA33',          // ← hex with alpha
+     label: {
+      kind: 'image',
+      src: '.\\assets\\logo.png',
+      fit: 'cover',        // fill card
+      zoom: 1.0            // no extra zoom
+    }
+  },
+  {
+    title: 'Text',
+    start: new Date('2023-04-01'),
+    overlayColor: '#FF00AA33',//'hsla(210, 50%, 50%, .2)',
+    label: { kind: 'text', text: 'blabla' }
+  }
+];
+
+new Timeline(items, {
+  mode: 'slider',
+  cardWidth: 140,
+  cardHeight: 200,
+  enforceUniformCardSize: true,
+  hideOverlappingLabels: true,
+  baselineY: 300,
+  canvasBackground: { kind: 'color', value: '#0b1220' }
+}).render(document.getElementById('app'));
 
 
-
-  // const tl1 = new Timeline(items, { mode: 'vertical' });
-  // tl1.render(document.getElementById('app1'));
-
-  //  new Timeline(items, {
-  //   mode: 'grid',
-  //   theme: {
-  //     primaryColor: '#e91e63',
-  //     backgroundColor: '#f0f0f0',
-  //     font: '"Comic Sans MS", cursive',
-  //     borderRadius: '10px'
-  //   }
-  // }).render(document.getElementById('app2'));
 </script>
 
 </body>
