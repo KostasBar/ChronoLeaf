@@ -463,7 +463,10 @@ export class SliderRenderer {
         .nodes() as SVGGElement[];
       let lastX = -Infinity;
       ticks.forEach((t) => {
-        const x = t.transform?.baseVal?.[0]?.matrix?.e ?? t.getCTM()?.e ?? 0;
+         const x =
+          (t as any).transform?.baseVal?.[0]?.matrix?.e
+          ?? (t as any).getCTM?.()?.e
+          ?? 0;
         if (x - lastX < minGap) {
           t.style.display = "none";
         } else {
