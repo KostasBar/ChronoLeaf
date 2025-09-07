@@ -3,7 +3,7 @@ import {
   TimelineItem,
   ITimelineConfig
 } from './interfaces';
-import { ParserFactory, DataType } from './ParserFactory';
+import { ParserFactory, DataType, ITimelineParser } from './ParserFactory';
 import { SliderRenderer } from '../renderers/SliderRenderer';
 import { VerticalRenderer } from '../renderers/VerticalRenderer';
 import { GridRenderer } from '../renderers/GridRenderer';
@@ -81,5 +81,21 @@ render(container: HTMLElement): void {
     static fromTEI(teiXml: string): Timeline {
     const items = ParserFactory.parse(teiXml, 'tei');
     return new Timeline(items);
+  }
+
+  //generic import
+  static from(data: string | object, format: DataType): Timeline {
+    const items = ParserFactory.parse(data, format);
+    return new Timeline(items);
+  }
+
+  //registration sugar
+  static registerParser(parser: ITimelineParser): void {
+    ParserFactory.register(parser);
+  }
+
+  // introspection
+  static supportedFormats(): string[] {
+    return ParserFactory.supportedFormats();
   }
 }
