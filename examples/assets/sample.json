@@ -1,0 +1,38 @@
+{
+  "items": [
+    {
+      "title": "Earth",
+      "start": "2021-06-15",
+      "overlayColor": "rgba(0,0,0,0.25)",
+      "label": {
+        "kind": "video",
+        "src": ".\\assets\\clip.mp4",
+        "fit": "cover",
+        "zoom": 2.5,
+        "muted": true,
+        "autoplay": true,
+        "loop": true
+      },
+      "metadata": { "category": "planet" }
+    },
+    {
+      "title": "Donut",
+      "start": "2022-03-01",
+      "overlayColor": "#FF00AA33",
+      "label": {
+        "kind": "image",
+        "src": ".\\assets\\logo.png",
+        "fit": "cover",
+        "zoom": 1.0
+      },
+      "metadata": { "category": "food" }
+    },
+    {
+      "title": "Text",
+      "start": "2023-04-01",
+      "overlayColor": "#FF00AA33",
+      "label": { "kind": "text", "text": "blabla" },
+      "metadata": { "category": "note" }
+    }
+  ]
+}

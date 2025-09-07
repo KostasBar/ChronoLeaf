@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <text>
+    <body>
+      <listEvent>
+        <event type="planet" when="2021-06-15">
+          <title>Earth</title>
+          <desc>Video label with tint</desc>
+          <label kind="video" src=".\assets\clip.mp4" />
+        </event>
+        <event type="food" when="2022-03-01">
+          <title>Donut</title>
+          <label kind="image" src=".\assets\logo.png" />
+        </event>
+        <event type="note" when="2023-04-01">
+          <title>Text</title>
+          <label kind="text">blabla</label>
+        </event>
+      </listEvent>
+    </body>
+  </text>
+</TEI>

@@ -1,0 +1,4 @@
+title,start,end,description,overlayColor,labelKind,labelText,labelSrc,labelWidth,labelHeight,labelFit,labelZoom,metadata
+Earth,2021-06-15,,Video label with tint,"rgba(0,0,0,0.25)",video,,.\assets\clip.mp4,140,200,cover,2.5,"{""category"":""planet""}"
+Donut,2022-03-01,,Image label with hex overlay,#FF00AA33,image,,.\assets\logo.png,140,200,cover,1.0,"{""category"":""food""}"
+Text,2023-04-01,,Plain text label,#FF00AA33,text,blabla,,,,,,"{""category"":""note""}"

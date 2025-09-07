@@ -54,6 +54,8 @@ export class SliderRenderer {
     const margin = { top: 10, right: 80, bottom: 50, left: 80 };
     const width = container.clientWidth - margin.left - margin.right;
     const height = container.clientHeight - margin.top - margin.bottom;
+    const minScale = (rawConfig as any).zoom?.minScale ?? 1;
+    const maxScale = (rawConfig as any).zoom?.maxScale ?? 80;
 
     // Root & SVG
     const root = select<HTMLElement, unknown>(container);
@@ -265,7 +267,8 @@ export class SliderRenderer {
       const cardG = gThis
         .append("g")
         .attr("class", "tl-card")
-        .attr("transform", `translate(${-w / 2}, ${yTop - h})`);
+        .attr("transform", `translate(${-w / 2}, ${yTop - h})`)
+        .attr("data-card-width", String(w));
 
       // card background shape (optional – keep if you like a base bg)
       cardG
@@ -296,7 +299,7 @@ export class SliderRenderer {
           .style("display", "flex")
           .style("align-items", "center") // ← kebab-case
           .style("justify-content", "center") // ← kebab-case
-          .style("padding", "8px")
+          .style("padding", "8px 12px 8px 10px")
           .style("text-align", "center")
           .style("font-family", "var(--tl-font, system-ui)")
           .style("color", "var(--tl-text-color, #e6eefc)") // brighter default for dark bg
@@ -374,7 +377,6 @@ export class SliderRenderer {
         } catch {}
       }
 
-      // 🔶 OVERLAY: draw LAST so it tints everything underneath
       if (d.overlayColor) {
         cardG
           .append("rect")
@@ -387,7 +389,7 @@ export class SliderRenderer {
           .attr("ry", 10)
           .attr("fill", d.overlayColor) // e.g. 'rgba(0,0,0,0.35)' or '#00000080'
           .style("opacity", "0.4")
-          .style("pointer-events", "none"); // don't block clicks/hover
+          .style("pointer-events", "none");
       }
 
       // base transform used for this card
@@ -461,7 +463,10 @@ export class SliderRenderer {
         .nodes() as SVGGElement[];
       let lastX = -Infinity;
       ticks.forEach((t) => {
-        const x = t.transform?.baseVal?.[0]?.matrix?.e ?? t.getCTM()?.e ?? 0;
+         const x =
+          (t as any).transform?.baseVal?.[0]?.matrix?.e
+          ?? (t as any).getCTM?.()?.e
+          ?? 0;
         if (x - lastX < minGap) {
           t.style.display = "none";
         } else {
@@ -571,7 +576,7 @@ export class SliderRenderer {
       SVGSVGElement,
       unknown
     >()
-      .scaleExtent([1, 20])
+      .scaleExtent([minScale, maxScale])
       .translateExtent([
         [0, 0],
         [width, height],
@@ -583,7 +588,7 @@ export class SliderRenderer {
       .on("zoom", (e) => {
         const t = e.transform as ZoomTransform;
         if (config.axisStrategy === "point") {
-          contentG.attr("transform", `translate(${t.x},0) scale(${t.k},1)`);
+          contentG.attr("transform", `translate(${t.x},0)`);
           draw(t);
         } else {
           contentG.attr("transform", null);
@@ -599,24 +604,36 @@ export class SliderRenderer {
     function computeInitialTransform(): ZoomTransform {
       if (items.length <= 1) return zoomIdentity;
 
+      const init = (rawConfig as any).zoom?.initialScale;
+      if (init && isFinite(init)) return zoomIdentity.scale(init);
       if (config.axisStrategy === "point") {
+
         const step = pointX.step?.() ?? width / Math.max(1, items.length - 1);
-        const k = Math.max(
+        const desired = Math.max(
           1,
-          Math.min(20, config.minLabelGap / Math.max(1, step))
+          (config.minLabelGap ?? 40) / Math.max(1, step)
         );
-        return zoomIdentity.scale(k);
+        return zoomIdentity.scale(
+          Math.min(maxScale, Math.max(minScale, desired))
+        );
       } else {
         let minDx = Infinity;
         for (let i = 1; i < items.length; i++) {
-          const x1 = timeX(items[i].start);
-          const x0 = timeX(items[i - 1].start);
-          const dx = Math.abs(x1 - x0);
+          const dx = Math.abs(
+            timeX(items[i].start) - timeX(items[i - 1].start)
+          );
           if (dx > 0 && dx < minDx) minDx = dx;
         }
         if (!isFinite(minDx) || minDx === 0) return zoomIdentity;
-        const k = Math.max(1, Math.min(20, config.minLabelGap / minDx));
-        return zoomIdentity.scale(k);
+
+        const targetGap = Math.max(
+          config.cardWidth + (config.labelCardGap ?? 8),
+          config.minLabelGap ?? 40
+        );
+        const desired = targetGap / minDx;
+        return zoomIdentity.scale(
+          Math.min(maxScale, Math.max(minScale, desired))
+        );
       }
     }
 

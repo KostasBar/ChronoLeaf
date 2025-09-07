@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timeline>
+  <item>
+    <title>Earth</title>
+    <start>2021-06-15</start>
+    <description>Video label with tint</description>
+    <overlayColor>rgba(0,0,0,0.25)</overlayColor>
+    <label kind="video" src=".\assets\clip.mp4" fit="cover" zoom="2.5" />
+  </item>
+  <item>
+    <title>Donut</title>
+    <start>2022-03-01</start>
+    <overlayColor>#FF00AA33</overlayColor>
+    <label kind="image" src=".\assets\logo.png" fit="cover" zoom="1.0" />
+  </item>
+  <item>
+    <title>Text</title>
+    <start>2023-04-01</start>
+    <overlayColor>#FF00AA33</overlayColor>
+    <label kind="text">blabla</label>
+  </item>
+</timeline>

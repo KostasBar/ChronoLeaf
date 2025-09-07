@@ -1,149 +1,331 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="el">
+<head>
+  <meta charset="utf-8" />
+  <title>ChronoLeaf – Extended Minimal Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    html, body, .container {
-    height: 100%;
-}
-
-.container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-} 
+    :root { color-scheme: dark; }
+    html, body { height: 100%; margin: 0; background: #1f2430; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    header { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 12px 16px; color: #e5e7eb; border-bottom: 1px solid #2f3545; }
+    header h1 { font-size: 16px; font-weight: 700; margin: 0; letter-spacing: .2px; }
+    .controls { display: grid; grid-template-columns: repeat(6, minmax(180px,1fr)); gap: 8px; }
+    .ctrl { background:#0b1220; border:1px solid #2f3545; border-radius: 10px; padding: 10px; }
+    .ctrl h3 { margin: 0 0 6px; font-size: 12px; opacity: .85; font-weight: 700; }
+    .ctrl label { display: block; font-size: 12px; margin: 6px 0 2px; opacity: .85; }
+    .ctrl input[type="text"], .ctrl input[type="number"], .ctrl select { width: 100%; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; border:1px solid #3b4151; background:#0f1628; color:#e5e7eb; }
+    .row { display:flex; gap:8px; align-items:center; }
+    .row > * { flex: 1; }
+    .note { font-size: 12px; opacity: .85; }
+    #app { width: 100%; height: calc(100% - 220px); display: grid; place-items: center; }
+    #mount { width: min(1200px, 96vw); height: min(560px, 78vh); border: 1px solid #2f3545; border-radius: 12px; background: #0b1220; }
+    .btn { background:#111827; color:#e5e7eb; border:1px solid #374151; border-radius:10px; padding:8px 12px; cursor:pointer; }
+    .btn:hover { background:#0e1526; }
+    .bar { display:flex; gap:8px; justify-content:flex-end; align-items:center; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
   </style>
-<body style="background-color: #4A4A4A;">
-<div class="container" >
-  <div id="app" style="width:1150px; height:480px; border:1px solid red;"></div>
-</div>
-<!-- 
-<div id="app1" style="width:200px; height:1000px;"></div>
-<div id="app2" style="width:800px; min-height:300px;"></div> -->
-<script type="module">
-  import { Timeline } from '../dist/chrono-leaf.es.js';
+</head>
+<body>
+  <header>
+    <h1>ChronoLeaf – Extended Minimal Demo (parsers + rich config)</h1>
+    <div class="bar">
+      <button id="renderBtn" class="btn">Render</button>
+      <span id="status" class="note mono"></span>
+    </div>
+    <div class="controls">
+      <div class="ctrl">
+        <h3>Parser</h3>
+        <label>Επιλογή</label>
+        <select id="parser">
+          <option value="json">JSON</option>
+          <option value="csv">CSV</option>
+          <option value="xml">XML</option>
+          <option value="tei">TEI</option>
+        </select>
+        <div class="note">Τα datasets παρακάτω έχουν εικόνες & βίντεο ως placeholders.
+          Αντικατάστησε τα <span class="mono">YOUR_*_URL</span> με πραγματικά URLs.</div>
+      </div>
 
-  // const items = [
-  //   { title: 'Start',    start: new Date('2020-01-01') }, 
-  //  // { title: 'Two',   start: new Date('2021-06-15') },
-  //   // { title: 'Three',   start: new Date('2022-06-15') },
-  //   { title: 'Four',   start: new Date('2023-06-15') },
-  //   { title: 'lorem',   start: new Date('2026-06-15') },
-  //   { title: 'lorem',   start: new Date('2025-12-15') },
-  //   { title: 'lorem',   start: new Date('2025-08-15') },
-  //   { title: 'lorem',   start: new Date('2015-06-15') },
-  //   { title: 'lorem',   start: new Date('2023-06-15') },
-  //   { title: 'lorem',   start: new Date('2024-03-02') },
-  //   { title: 'Ipsum',   start: new Date('2020-11-04') },
-  //   { title: 'blabla',   start: new Date('2022-09-15') },
-  //       { title: 'lorem',   start: new Date('2026-06-15') },
-  //   { title: 'lorem',   start: new Date('2025-12-16') },
-  //   { title: 'lorem',   start: new Date('2026-08-15') },
-  //   { title: 'lorem',   start: new Date('2015-10-15') },
-  //   { title: 'lorem',   start: new Date('2023-05-25') },
-  //   { title: 'lorem',   start: new Date('2024-03-22') },
-  //   { title: 'Ipsum',   start: new Date('2020-01-04') },
-  //   { title: 'blabla',   start: new Date('2022-09-15') },
-  //   { title: 'test',   start: new Date('2024-01-15') },
-  //   { title: 'more test',   start: new Date('2020-04-15') },
-  //   { title: 'all the test',   start: new Date('2020-07-15') },
-  //   { title: 'almost there',   start: new Date('2020-08-15') },
-  //   { title: 'Middle',   start: new Date('2020-06-15') },
-  //   { title: 'Today',    start: new Date() },
-  //     { title: 'Start', start: new Date('2020-01-01'), label: { kind: 'text', text: 'Start' } },
-  // { title: 'Logo',  start: new Date('2021-06-15'), label: { kind: 'image', src: '.\\assets\\logo.png', height: 24, alt: 'Logo' } },
-  // { title: 'Clip',  start: new Date('2022-06-15'), label: { kind: 'video', src: '.\\assets\\clip.mp4', width: 72, height: 40, muted: true, autoplay: false, controls: true } },
-  // { title: 'Plain text fallback', start: new Date('2023-06-15') } // no label → uses title as text
-  // ];
+      <div class="ctrl">
+        <h3>Άξονας & Κάρτες</h3>
+        <label>axisStrategy</label>
+        <select id="axis">
+          <option value="time">time</option>
+          <option value="point">point</option>
+        </select>
+        <label>cardWidth / cardHeight</label>
+        <div class="row">
+          <input id="cardW" type="number" value="180" min="80" max="400" />
+          <input id="cardH" type="number" value="220" min="80" max="400" />
+        </div>
+        <label>enforceUniformCardSize</label>
+        <select id="uniform">
+          <option value="true">true</option>
+          <option value="false">false</option>
+        </select>
+        <label>mediaObjectFit (global)</label>
+        <select id="fit">
+          <option value="cover">cover</option>
+          <option value="contain">contain</option>
+        </select>
+      </div>
 
-// const items = [
-//   {
-//     title: 'Earth',
-//     start: new Date('2021-06-15'),
-//     label: {
-//       kind: 'video',
-//       src: '.\\assets\\clip.mp4',
-//       fit: 'cover',        // fill card
-//       zoom: 2.5,          // trim tiny letterbox bars
-//       muted: true,         // (redundant; we set it by default)
-//       autoplay: true,      // (redundant; defaulted)
-//       loop: true           // (redundant; defaulted)
-//     }
-//   },
-//   {
-//     title: 'Donut',
-//     start: new Date('2022-03-01'),
-//     label: {
-//       kind: 'image',
-//       src: '.\\assets\\logo.png',
-//       fit: 'cover',        // fill card
-//       zoom: 1.0            // no extra zoom
-//     }
-//   },
-//   {
-//     title: 'blabla',
-//     start: new Date('2023-04-01'),
-//     label: { kind: 'text', text: 'blabla' },
-//     background: { type: 'color', source: '#FF0000', overlayColor: '#FF0000' }
-//   }
-// ];
+      <div class="ctrl">
+        <h3>Διάταξη & Συγκρούσεις</h3>
+        <label>minLabelGap</label>
+        <input id="minGap" type="number" value="28" min="0" max="200" />
+        <label>labelCardGap</label>
+        <input id="cardGap" type="number" value="8" min="0" max="60" />
+        <label>hideOverlappingLabels</label>
+        <select id="hideOverlap">
+          <option value="true">true</option>
+          <option value="false">false</option>
+        </select>
+        <label>labelYOffset</label>
+        <input id="yOff" type="number" value="-16" min="-200" max="200" />
+        <label>baselineY</label>
+        <input id="baselineY" type="number" value="340" min="0" max="800" />
+      </div>
 
-// new Timeline(items, {
-//   mode: 'slider',
-//   // uniform portrait card size
-//   cardWidth: 140,
-//   cardHeight: 200,
-//   enforceUniformCardSize: true,
-//   hideOverlappingLabels: true,
-//   axisStrategy: 'time',
-//   // canvasBackground: { kind: 'color', value: '#0b1220' }, // dark navy
-//   baselineY: 300
-// }).render(document.getElementById('app'));
+      <div class="ctrl">
+        <h3>Θέμα</h3>
+        <label>theme</label>
+        <select id="theme">
+          <option value="dark">dark</option>
+          <option value="light">light</option>
+          <option value="custom">custom object</option>
+        </select>
+        <label>custom primaryColor</label>
+        <input id="thPrimary" type="text" value="#8ab4f8" />
+        <label>custom backgroundColor</label>
+        <input id="thBg" type="text" value="#0b1220" />
+        <label>custom font</label>
+        <input id="thFont" type="text" value="system-ui, sans-serif" />
+      </div>
 
-const items = [
-  {
-    title: 'Earth',
-    start: new Date('2021-06-15'),
-    overlayColor: 'rgba(0,0,0,0.25)',   // ← tint the video
-    label: {
-      kind: 'video',
-      src: '.\\assets\\clip.mp4',
-      fit: 'cover',        // fill card
-      zoom: 2.5,          // trim tiny letterbox bars
-      muted: true,         // (redundant; we set it by default)
-      autoplay: true,      // (redundant; defaulted)
-      loop: true           // (redundant; defaulted)
+      <div class="ctrl">
+        <h3>Canvas Background</h3>
+        <label>background kind</label>
+        <select id="bgKind">
+          <option value="none">none</option>
+          <option value="color">color</option>
+          <option value="image">image</option>
+          <option value="video">video</option>
+        </select>
+        <label>value/src</label>
+        <input id="bgVal" type="text" value="#0b1220" />
+        <div class="row">
+          <label style="flex:2">fit</label>
+          <select id="bgFit">
+            <option value="cover">cover</option>
+            <option value="contain">contain</option>
+          </select>
+          <label style="flex:2">opacity</label>
+          <input id="bgOpacity" type="number" value="1" min="0" max="1" step="0.05" />
+        </div>
+      </div>
+
+      <div class="ctrl">
+        <h3>Hooks / Events</h3>
+        <div class="note">Κάνε hover/click στις κάρτες για log. Γίνεται επίσης log στο range αλλαγών.</div>
+        <div id="log" class="mono" style="font-size:12px; max-height:120px; overflow:auto; background:#0f1628; padding:8px; border-radius:8px; border:1px solid #3b4151"></div>
+      </div>
+    </div>
+  </header>
+
+  <div id="app"><div id="mount"></div></div>
+
+  <script type="module">
+    import { Timeline } from '../dist/chrono-leaf.es.js';
+
+    const mount = document.getElementById('mount');
+    const logEl = document.getElementById('log');
+    const statusEl = document.getElementById('status');
+
+    function log(msg){
+      const time = new Date().toLocaleTimeString();
+      logEl.textContent = `[${time}] ${msg}
+` + logEl.textContent;
     }
-  },
-  {
-    title: 'Donut',
-    start: new Date('2022-03-01'),
-    overlayColor: '#FF00AA33',          // ← hex with alpha
-     label: {
-      kind: 'image',
-      src: '.\\assets\\logo.png',
-      fit: 'cover',        // fill card
-      zoom: 1.0            // no extra zoom
+
+    // ------------------------------------------------------------------
+    // Datasets (Greek Song History 1959–1990), with text/image/video labels
+    // Replace YOUR_IMAGE_URL_* and YOUR_VIDEO_URL_* with real links.
+    // ------------------------------------------------------------------
+
+    // CSV
+    const csvText = [
+      'title,start,end,description,overlayColor,labelKind,labelText,labelSrc,labelWidth,labelHeight,labelFit,labelZoom,metadata',
+      'Μ.Χατζιδάκις,1959-03-01,,Άνθηση ελαφρού τραγουδιού,,text,Το Παιδί Που Ζει Στο Όνειρο,,,,,,{"genre":"light"}',
+      'Μ.Θεοδωράκης,1960-05-01,,Στροφή στο έντεχνο,,image,,.\\assets\\logo.png,180,120,contain,1,{"genre":"entechno"}',
+      'Δικτατορία,1967-04-21,1974-07-24,Λογοκρισία και αντίσταση,rgba(255,0,0,0.18),text,Περίοδος,,,,,,{"type":"period"}',
+      'Νέο Κύμα,1969-02-01,,Μικρές μπαλάντες,,video,,.\\assets\\clip.mp4,240,160,cover,1.05,{"note":"sample video"}',
+      'Χάρις Αλεξίου,1979-10-01,,Δισκογραφική άνοδος,,image,,.\\assets\\logo.png,200,200,cover,1,{"artist":"Haris Alexiou"}',
+      'Ποπ 80s,1987-06-01,,Νέες παραγωγές & synth,rgba(0,128,255,0.12),text,80s,,,,,,{"mood":"pop"}',
+      'Ροκ Είσοδος,1971-06-01,,Συγκροτήματα και πειραματισμός,,video,,.\\assets\\clip.mp4,200,140,contain,1.1,{"tag":"rock"}'
+    ].join('\n');
+
+    // JSON
+    const jsonObj = {
+      items: [
+        { title: 'Μ.Χατζιδάκις', start: '1959-03-01', description: 'Άνθηση ελαφρού τραγουδιού', label: { kind: 'text', text: 'Το Παιδί Που Ζει Στο Όνειρο' }, metadata: { genre: 'light' } },
+        { title: 'Μ.Θεοδωράκης', start: '1960-05-01', description: 'Στροφή στο έντεχνο', label: { kind: 'image', src: '.\\assets\\logo.png', width: 180, height: 120, fit: 'contain', alt: 'Επιτάφιος' } },
+        { title: 'Δικτατορία', start: '1967-04-21', end: '1974-07-24', description: 'Λογοκρισία και αντίσταση', overlayColor: 'rgba(255,0,0,0.18)', label: { kind: 'text', text: 'Περίοδος' }, metadata: { type: 'period' } },
+        { title: 'Νέο Κύμα', start: '1969-02-01', description: 'Μικρές μπαλάντες', label: { kind: 'video', src: ".\\assets\\clip.mp4", width: 240, height: 160, fit: 'cover', poster: '.\\assets\\logo.png', loop: true, autoplay: true, muted: true } },
+        { title: 'Χ. Αλεξίου', start: '1979-10-01', description: 'Δισκογραφική άνοδος', label: { kind: 'image', src: '.\\assets\\logo.png', fit: 'cover', zoom: 1 } },
+        { title: 'Ποπ 80s', start: '1987-06-01', description: 'Νέες παραγωγές & synth', overlayColor: 'rgba(0,128,255,0.12)', label: { kind: 'text', text: '80s' } },
+        // micro-dense moments (ώρες/λεπτά)
+        { title: 'Μεταπολίτευση Α', start: '1974-07-24T10:00:00Z', description: 'Στιγμή Α', label: { kind: 'text', text: 'Α' } },
+        { title: 'Μεταπολίτευση Β', start: '1974-08-15T10:05:00Z', description: 'Στιγμή Β', label: { kind: 'text', text: 'Β' } }
+      ]
+    };
+
+    // XML
+    const xmlText = `<?xml version="1.0"?>
+<timeline>
+  <item>
+    <title>Μ.Χατζιδάκις</title>
+    <start>1959-03-01</start>
+    <description>Άνθηση ελαφρού τραγουδιού</description>
+    <label kind="text">Το Παιδί Που Ζει Στο Όνειρο</label>
+  </item>
+  <item>
+    <title>Μ.Θεοδωράκης</title>
+    <start>1960-05-01</start>
+    <description>Στροφή στο έντεχνο</description>
+    <label kind="image" src=".\\assets\\logo.png" width="180" height="120" fit="contain" />
+  </item>
+  <item>
+    <title>Νέο Κύμα</title>
+    <start>1969-02-01</start>
+    <description>Μικρές μπαλάντες</description>
+    <label kind="video" src=".\\assets\\clip.mp4" width="240" height="160" fit="cover" />
+  </item>
+  <item>
+    <title>Δικτατορία</title>
+    <start>1967-04-21</start>
+    <end>1974-07-24</end>
+    <description>Λογοκρισία και αντίσταση</description>
+    <overlayColor>rgba(255,0,0,0.18)</overlayColor>
+  </item>
+</timeline>`;
+
+    // TEI (listEvent/event + date/@when)
+    const teiText = `<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<TEI xmlns=\"http://www.tei-c.org/ns/1.0\">
+  <text><body>
+    <listEvent>
+      <event type=\"song\">
+        <title>Μ.Χατζιδάκις</title>
+        <desc>Άνθηση ελαφρού τραγουδιού</desc>
+        <date when=\"1959-03-01\"/>
+        <label kind=\"text\">Το Παιδί Που Ζει Στο Όνειρο</label>
+      </event>
+      <event type=\"song\">
+        <title>Μ.Θεοδωράκης</title>
+        <desc>Στροφή στο έντεχνο</desc>
+        <date when=\"1960-05-01\"/>
+        <label kind=\"image\" src=\".\\assets\\logo.png\"/>
+      </event>
+      <event type=\"period\">
+        <title>Δικτατορία</title>
+        <desc>Λογοκρισία και αντίσταση</desc>
+        <date when=\"1967-04-21\"/>
+        <label kind=\"video\" src=\".\\assets\\clip.mp4\"/>
+      </event>
+    </listEvent>
+  </body></text>
+</TEI>`;
+
+    // ------------------------------------------------------------------
+    // Helpers to read controls → config object
+    // ------------------------------------------------------------------
+    const $ = (id) => document.getElementById(id);
+
+    function buildConfig(){
+      const axis = $('axis').value;
+      const enforceUniformCardSize = $('uniform').value === 'true';
+      const hideOverlappingLabels = $('hideOverlap').value === 'true';
+      const cardWidth = Number($('cardW').value || 180);
+      const cardHeight = Number($('cardH').value || 220);
+      const minLabelGap = Number($('minGap').value || 28);
+      const labelCardGap = Number($('cardGap').value || 8);
+      const labelYOffset = Number($('yOff').value || -16);
+      const baselineY = Number($('baselineY').value || 340);
+      const mediaObjectFit = $('fit').value;
+
+      // theme
+      const themeSel = $('theme').value;
+      let theme = themeSel;
+      if (themeSel === 'custom') {
+        theme = {
+          primaryColor: $('thPrimary').value || '#8ab4f8',
+          backgroundColor: $('thBg').value || '#0b1220',
+          font: $('thFont').value || 'system-ui, sans-serif'
+        };
+      }
+
+      // canvas background
+      const bgKind = $('bgKind').value;
+      let canvasBackground = undefined;
+      if (bgKind === 'color') canvasBackground = { kind: 'color', value: $('bgVal').value || '#0b1220' };
+      if (bgKind === 'image') canvasBackground = { kind: 'image', src: $('bgVal').value || 'YOUR_IMAGE_URL_BG', fit: $('bgFit').value, opacity: Number($('bgOpacity').value || 1) };
+      if (bgKind === 'video') canvasBackground = { kind: 'video', src: $('bgVal').value || 'YOUR_VIDEO_URL_BG', fit: $('bgFit').value, opacity: Number($('bgOpacity').value || 1), loop: true, autoplay: true, muted: true };
+
+      return {
+        theme,
+        mode: 'slider',
+        axisStrategy: axis,
+        cardWidth, cardHeight,
+        enforceUniformCardSize,
+        hideOverlappingLabels,
+        minLabelGap, labelCardGap,
+        labelYOffset,
+        baselineY,
+        mediaObjectFit,
+        canvasBackground,
+        onItemClick: (item, ev) => log(`click: ${item.title}`),
+        onItemHover: (item, ev) => log(`hover: ${item.title}`),
+        onRangeChange: (rng) => log(`range: ${rng[0].toISOString()} → ${rng[1].toISOString()}`)
+      };
     }
-  },
-  {
-    title: 'Text',
-    start: new Date('2023-04-01'),
-    overlayColor: '#FF00AA33',//'hsla(210, 50%, 50%, .2)',
-    label: { kind: 'text', text: 'blabla' }
-  }
-];
 
-new Timeline(items, {
-  mode: 'slider',
-  cardWidth: 140,
-  cardHeight: 200,
-  enforceUniformCardSize: true,
-  hideOverlappingLabels: true,
-  baselineY: 300,
-  canvasBackground: { kind: 'color', value: '#0b1220' }
-}).render(document.getElementById('app'));
+    // ------------------------------------------------------------------
+    // Render based on selected parser
+    // ------------------------------------------------------------------
+    function getData(kind){
+      if (kind === 'csv') return csvText;
+      if (kind === 'json') return jsonObj;
+      if (kind === 'xml') return xmlText;
+      if (kind === 'tei') return teiText;
+    }
 
+    async function render(){
+      const kind = $('parser').value;
+      const cfg = buildConfig();
 
-</script>
+      let tl;
+      if (kind === 'csv') tl = Timeline.fromCSV(getData('csv'));
+      if (kind === 'json') tl = Timeline.fromJSON(getData('json'));
+      if (kind === 'xml') tl = Timeline.fromXML(getData('xml'));
+      if (kind === 'tei') tl = Timeline.fromTEI(getData('tei'));
 
+      tl.config = { ...tl.config, ...cfg };
+      statusEl.textContent = 'Rendering…';
+      try {
+        await tl.render(mount);
+        statusEl.textContent = `OK – ${kind.toUpperCase()} (${tl.items.length} items)`;
+      } catch (e) {
+        statusEl.textContent = 'Error';
+        log(String(e));
+        console.error(e);
+      }
+    }
+
+    document.getElementById('renderBtn').addEventListener('click', render);
+
+    // default render
+    render();
+  </script>
 </body>
 </html>

@@ -60,6 +60,8 @@ export interface ITimelineConfig {
 
   /** Optional full-canvas background (color / image / video). */
   canvasBackground?: CanvasBackground;
+
+  zoom?: { minScale?: number; maxScale?: number; initialScale?: number };
 }
 
 export type CanvasBackground =
@@ -96,7 +98,6 @@ export type TimelineItem = {
 
   metadata?: Record<string, any>;
 };
-
 
 /** Rich label content displayed at the event's x-position. */
 export type LabelContent =
