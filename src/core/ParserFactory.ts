@@ -5,7 +5,7 @@ import { XMLParser } from "../parsers/XMLParser";
 import { TEIParser } from "../parsers/TEIParser";
 
 export interface ITimelineParser {
-  readonly name: string;                       
+  readonly name: string;
   parse(data: string | object): TimelineItem[];
 }
 
@@ -23,15 +23,28 @@ export class ParserFactory {
   }
 
   static parse(data: string | object, type: DataType): TimelineItem[] {
-
-    const custom = customParsers.get(String(type).toLowerCase());
+    const normalizedType = String(type).toLowerCase();
+    const custom = customParsers.get(normalizedType);
     if (custom) return custom.parse(data);
 
-    switch (type) {
-      case "csv": return CSVParser.parse(data as string);
-      case "json": return JSONParser.parse(data);
-      case "xml": return XMLParser.parse(data as string);
-      case "tei": return TEIParser.parse(data as string);
+    switch (normalizedType) {
+      case "csv":
+        if (typeof data !== "string") {
+          throw new Error("CSV parser expects a string input.");
+        }
+        return CSVParser.parse(data);
+      case "json":
+        return JSONParser.parse(data);
+      case "xml":
+        if (typeof data !== "string") {
+          throw new Error("XML parser expects a string input.");
+        }
+        return XMLParser.parse(data);
+      case "tei":
+        if (typeof data !== "string") {
+          throw new Error("TEI parser expects a string input.");
+        }
+        return TEIParser.parse(data);
       default:
         throw new Error(`Unsupported data type: ${type}`);
     }

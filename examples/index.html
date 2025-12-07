@@ -1,331 +1,207 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="el">
 <head>
   <meta charset="utf-8" />
-  <title>ChronoLeaf – Extended Minimal Demo</title>
+  <title>Timeline Manual Test</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- βοηθά τα σχετικά paths όταν ανοίγεις με file:// -->
+  <base href="./" />
   <style>
-    :root { color-scheme: dark; }
-    html, body { height: 100%; margin: 0; background: #1f2430; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-    header { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 12px 16px; color: #e5e7eb; border-bottom: 1px solid #2f3545; }
-    header h1 { font-size: 16px; font-weight: 700; margin: 0; letter-spacing: .2px; }
-    .controls { display: grid; grid-template-columns: repeat(6, minmax(180px,1fr)); gap: 8px; }
-    .ctrl { background:#0b1220; border:1px solid #2f3545; border-radius: 10px; padding: 10px; }
-    .ctrl h3 { margin: 0 0 6px; font-size: 12px; opacity: .85; font-weight: 700; }
-    .ctrl label { display: block; font-size: 12px; margin: 6px 0 2px; opacity: .85; }
-    .ctrl input[type="text"], .ctrl input[type="number"], .ctrl select { width: 100%; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; border:1px solid #3b4151; background:#0f1628; color:#e5e7eb; }
-    .row { display:flex; gap:8px; align-items:center; }
-    .row > * { flex: 1; }
-    .note { font-size: 12px; opacity: .85; }
-    #app { width: 100%; height: calc(100% - 220px); display: grid; place-items: center; }
-    #mount { width: min(1200px, 96vw); height: min(560px, 78vh); border: 1px solid #2f3545; border-radius: 12px; background: #0b1220; }
-    .btn { background:#111827; color:#e5e7eb; border:1px solid #374151; border-radius:10px; padding:8px 12px; cursor:pointer; }
-    .btn:hover { background:#0e1526; }
-    .bar { display:flex; gap:8px; justify-content:flex-end; align-items:center; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    :root{
+      --tl-font: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      --tl-primary-color:#4f7fff;
+      --tl-background-color:#0b1020;
+      --tl-text-color:#e6eefc;
+      --tl-card-radius:14px;
+    }
+    body{margin:0;background:#060a16;color:#e6eefc;font-family:var(--tl-font)}
+    .row{display:flex;gap:16px;padding:16px;flex-wrap:wrap}
+    .col{flex:1 1 600px;min-width:360px;background:#0b1020;border:1px solid #1b2240;border-radius:12px;padding:12px}
+    h2{margin:6px 0 12px 6px;font-size:15px;opacity:.85}
+    #controls{position:sticky;top:0;background:#0b1020;padding:12px;z-index:999;border-bottom:1px solid #1b2240}
+    button{background:#1a2446;color:#e6eefc;border:1px solid #2b3867;border-radius:8px;padding:8px 10px;cursor:pointer}
+    button[disabled]{opacity:.4;cursor:default}
+    .pad{padding:8px}
+    .pane{height:420px;border-radius:10px;overflow:hidden;background:#0e1426}
   </style>
 </head>
 <body>
-  <header>
-    <h1>ChronoLeaf – Extended Minimal Demo (parsers + rich config)</h1>
-    <div class="bar">
-      <button id="renderBtn" class="btn">Render</button>
-      <span id="status" class="note mono"></span>
+  <div id="controls">
+    <button id="loadSmall">Load SMALL</button>
+    <button id="loadMixed">Load MIXED</button>
+    <button id="loadDense">Load DENSE</button>
+    <span class="pad"></span>
+    <button id="modeTime">Time mode</button>
+    <button id="modePoint">Point mode</button>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h2>SliderRenderer</h2>
+      <div id="slider" class="pane"></div>
     </div>
-    <div class="controls">
-      <div class="ctrl">
-        <h3>Parser</h3>
-        <label>Επιλογή</label>
-        <select id="parser">
-          <option value="json">JSON</option>
-          <option value="csv">CSV</option>
-          <option value="xml">XML</option>
-          <option value="tei">TEI</option>
-        </select>
-        <div class="note">Τα datasets παρακάτω έχουν εικόνες & βίντεο ως placeholders.
-          Αντικατάστησε τα <span class="mono">YOUR_*_URL</span> με πραγματικά URLs.</div>
-      </div>
-
-      <div class="ctrl">
-        <h3>Άξονας & Κάρτες</h3>
-        <label>axisStrategy</label>
-        <select id="axis">
-          <option value="time">time</option>
-          <option value="point">point</option>
-        </select>
-        <label>cardWidth / cardHeight</label>
-        <div class="row">
-          <input id="cardW" type="number" value="180" min="80" max="400" />
-          <input id="cardH" type="number" value="220" min="80" max="400" />
-        </div>
-        <label>enforceUniformCardSize</label>
-        <select id="uniform">
-          <option value="true">true</option>
-          <option value="false">false</option>
-        </select>
-        <label>mediaObjectFit (global)</label>
-        <select id="fit">
-          <option value="cover">cover</option>
-          <option value="contain">contain</option>
-        </select>
-      </div>
-
-      <div class="ctrl">
-        <h3>Διάταξη & Συγκρούσεις</h3>
-        <label>minLabelGap</label>
-        <input id="minGap" type="number" value="28" min="0" max="200" />
-        <label>labelCardGap</label>
-        <input id="cardGap" type="number" value="8" min="0" max="60" />
-        <label>hideOverlappingLabels</label>
-        <select id="hideOverlap">
-          <option value="true">true</option>
-          <option value="false">false</option>
-        </select>
-        <label>labelYOffset</label>
-        <input id="yOff" type="number" value="-16" min="-200" max="200" />
-        <label>baselineY</label>
-        <input id="baselineY" type="number" value="340" min="0" max="800" />
-      </div>
-
-      <div class="ctrl">
-        <h3>Θέμα</h3>
-        <label>theme</label>
-        <select id="theme">
-          <option value="dark">dark</option>
-          <option value="light">light</option>
-          <option value="custom">custom object</option>
-        </select>
-        <label>custom primaryColor</label>
-        <input id="thPrimary" type="text" value="#8ab4f8" />
-        <label>custom backgroundColor</label>
-        <input id="thBg" type="text" value="#0b1220" />
-        <label>custom font</label>
-        <input id="thFont" type="text" value="system-ui, sans-serif" />
-      </div>
-
-      <div class="ctrl">
-        <h3>Canvas Background</h3>
-        <label>background kind</label>
-        <select id="bgKind">
-          <option value="none">none</option>
-          <option value="color">color</option>
-          <option value="image">image</option>
-          <option value="video">video</option>
-        </select>
-        <label>value/src</label>
-        <input id="bgVal" type="text" value="#0b1220" />
-        <div class="row">
-          <label style="flex:2">fit</label>
-          <select id="bgFit">
-            <option value="cover">cover</option>
-            <option value="contain">contain</option>
-          </select>
-          <label style="flex:2">opacity</label>
-          <input id="bgOpacity" type="number" value="1" min="0" max="1" step="0.05" />
-        </div>
-      </div>
-
-      <div class="ctrl">
-        <h3>Hooks / Events</h3>
-        <div class="note">Κάνε hover/click στις κάρτες για log. Γίνεται επίσης log στο range αλλαγών.</div>
-        <div id="log" class="mono" style="font-size:12px; max-height:120px; overflow:auto; background:#0f1628; padding:8px; border-radius:8px; border:1px solid #3b4151"></div>
-      </div>
+    <div class="col">
+      <h2>VerticalRenderer</h2>
+      <div id="vertical" class="pane"></div>
     </div>
-  </header>
+  </div>
 
-  <div id="app"><div id="mount"></div></div>
+  <div class="row">
+    <div class="col" style="flex:1 1 100%">
+      <h2>GridRenderer</h2>
+      <div id="grid" class="pane" style="height:auto;max-height:70vh;overflow:auto"></div>
+    </div>
+  </div>
 
   <script type="module">
-    import { Timeline } from '../dist/chrono-leaf.es.js';
+    import { SliderRenderer }   from "../src/renderers/SliderRenderer";
+    import { VerticalRenderer } from "../src/renderers/VerticalRenderer";
+    import { GridRenderer }     from "../src/renderers/GridRenderer";
+    import { fixtures }         from "../tests/fixtures";
 
-    const mount = document.getElementById('mount');
-    const logEl = document.getElementById('log');
-    const statusEl = document.getElementById('status');
+    // -----------------------------
+    // BUSINESS LOGIC (paths & media)
+    // -----------------------------
 
-    function log(msg){
-      const time = new Date().toLocaleTimeString();
-      logEl.textContent = `[${time}] ${msg}
-` + logEl.textContent;
+    const ASSETS_BASE_CANDIDATES = [
+      "./examples/assets/",
+      "../examples/assets/",
+      "./assets/",
+    ];
+
+    function pickAssetsBase() {
+      for (const b of ASSETS_BASE_CANDIDATES) {
+
+        return b;
+      }
+      return "./";
     }
 
-    // ------------------------------------------------------------------
-    // Datasets (Greek Song History 1959–1990), with text/image/video labels
-    // Replace YOUR_IMAGE_URL_* and YOUR_VIDEO_URL_* with real links.
-    // ------------------------------------------------------------------
+    const ASSETS_BASE = pickAssetsBase();
 
-    // CSV
-    const csvText = [
-      'title,start,end,description,overlayColor,labelKind,labelText,labelSrc,labelWidth,labelHeight,labelFit,labelZoom,metadata',
-      'Μ.Χατζιδάκις,1959-03-01,,Άνθηση ελαφρού τραγουδιού,,text,Το Παιδί Που Ζει Στο Όνειρο,,,,,,{"genre":"light"}',
-      'Μ.Θεοδωράκης,1960-05-01,,Στροφή στο έντεχνο,,image,,.\\assets\\logo.png,180,120,contain,1,{"genre":"entechno"}',
-      'Δικτατορία,1967-04-21,1974-07-24,Λογοκρισία και αντίσταση,rgba(255,0,0,0.18),text,Περίοδος,,,,,,{"type":"period"}',
-      'Νέο Κύμα,1969-02-01,,Μικρές μπαλάντες,,video,,.\\assets\\clip.mp4,240,160,cover,1.05,{"note":"sample video"}',
-      'Χάρις Αλεξίου,1979-10-01,,Δισκογραφική άνοδος,,image,,.\\assets\\logo.png,200,200,cover,1,{"artist":"Haris Alexiou"}',
-      'Ποπ 80s,1987-06-01,,Νέες παραγωγές & synth,rgba(0,128,255,0.12),text,80s,,,,,,{"mood":"pop"}',
-      'Ροκ Είσοδος,1971-06-01,,Συγκροτήματα και πειραματισμός,,video,,.\\assets\\clip.mp4,200,140,contain,1.1,{"tag":"rock"}'
-    ].join('\n');
+    function normalizeSrc(src) {
+      if (!src) return src;
 
-    // JSON
-    const jsonObj = {
-      items: [
-        { title: 'Μ.Χατζιδάκις', start: '1959-03-01', description: 'Άνθηση ελαφρού τραγουδιού', label: { kind: 'text', text: 'Το Παιδί Που Ζει Στο Όνειρο' }, metadata: { genre: 'light' } },
-        { title: 'Μ.Θεοδωράκης', start: '1960-05-01', description: 'Στροφή στο έντεχνο', label: { kind: 'image', src: '.\\assets\\logo.png', width: 180, height: 120, fit: 'contain', alt: 'Επιτάφιος' } },
-        { title: 'Δικτατορία', start: '1967-04-21', end: '1974-07-24', description: 'Λογοκρισία και αντίσταση', overlayColor: 'rgba(255,0,0,0.18)', label: { kind: 'text', text: 'Περίοδος' }, metadata: { type: 'period' } },
-        { title: 'Νέο Κύμα', start: '1969-02-01', description: 'Μικρές μπαλάντες', label: { kind: 'video', src: ".\\assets\\clip.mp4", width: 240, height: 160, fit: 'cover', poster: '.\\assets\\logo.png', loop: true, autoplay: true, muted: true } },
-        { title: 'Χ. Αλεξίου', start: '1979-10-01', description: 'Δισκογραφική άνοδος', label: { kind: 'image', src: '.\\assets\\logo.png', fit: 'cover', zoom: 1 } },
-        { title: 'Ποπ 80s', start: '1987-06-01', description: 'Νέες παραγωγές & synth', overlayColor: 'rgba(0,128,255,0.12)', label: { kind: 'text', text: '80s' } },
-        // micro-dense moments (ώρες/λεπτά)
-        { title: 'Μεταπολίτευση Α', start: '1974-07-24T10:00:00Z', description: 'Στιγμή Α', label: { kind: 'text', text: 'Α' } },
-        { title: 'Μεταπολίτευση Β', start: '1974-08-15T10:05:00Z', description: 'Στιγμή Β', label: { kind: 'text', text: 'Β' } }
-      ]
-    };
+      // ήδη URL/data
+      if (/^(https?:|file:|data:)/i.test(src)) return src;
 
-    // XML
-    const xmlText = `<?xml version="1.0"?>
-<timeline>
-  <item>
-    <title>Μ.Χατζιδάκις</title>
-    <start>1959-03-01</start>
-    <description>Άνθηση ελαφρού τραγουδιού</description>
-    <label kind="text">Το Παιδί Που Ζει Στο Όνειρο</label>
-  </item>
-  <item>
-    <title>Μ.Θεοδωράκης</title>
-    <start>1960-05-01</start>
-    <description>Στροφή στο έντεχνο</description>
-    <label kind="image" src=".\\assets\\logo.png" width="180" height="120" fit="contain" />
-  </item>
-  <item>
-    <title>Νέο Κύμα</title>
-    <start>1969-02-01</start>
-    <description>Μικρές μπαλάντες</description>
-    <label kind="video" src=".\\assets\\clip.mp4" width="240" height="160" fit="cover" />
-  </item>
-  <item>
-    <title>Δικτατορία</title>
-    <start>1967-04-21</start>
-    <end>1974-07-24</end>
-    <description>Λογοκρισία και αντίσταση</description>
-    <overlayColor>rgba(255,0,0,0.18)</overlayColor>
-  </item>
-</timeline>`;
-
-    // TEI (listEvent/event + date/@when)
-    const teiText = `<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<TEI xmlns=\"http://www.tei-c.org/ns/1.0\">
-  <text><body>
-    <listEvent>
-      <event type=\"song\">
-        <title>Μ.Χατζιδάκις</title>
-        <desc>Άνθηση ελαφρού τραγουδιού</desc>
-        <date when=\"1959-03-01\"/>
-        <label kind=\"text\">Το Παιδί Που Ζει Στο Όνειρο</label>
-      </event>
-      <event type=\"song\">
-        <title>Μ.Θεοδωράκης</title>
-        <desc>Στροφή στο έντεχνο</desc>
-        <date when=\"1960-05-01\"/>
-        <label kind=\"image\" src=\".\\assets\\logo.png\"/>
-      </event>
-      <event type=\"period\">
-        <title>Δικτατορία</title>
-        <desc>Λογοκρισία και αντίσταση</desc>
-        <date when=\"1967-04-21\"/>
-        <label kind=\"video\" src=\".\\assets\\clip.mp4\"/>
-      </event>
-    </listEvent>
-  </body></text>
-</TEI>`;
-
-    // ------------------------------------------------------------------
-    // Helpers to read controls → config object
-    // ------------------------------------------------------------------
-    const $ = (id) => document.getElementById(id);
-
-    function buildConfig(){
-      const axis = $('axis').value;
-      const enforceUniformCardSize = $('uniform').value === 'true';
-      const hideOverlappingLabels = $('hideOverlap').value === 'true';
-      const cardWidth = Number($('cardW').value || 180);
-      const cardHeight = Number($('cardH').value || 220);
-      const minLabelGap = Number($('minGap').value || 28);
-      const labelCardGap = Number($('cardGap').value || 8);
-      const labelYOffset = Number($('yOff').value || -16);
-      const baselineY = Number($('baselineY').value || 340);
-      const mediaObjectFit = $('fit').value;
-
-      // theme
-      const themeSel = $('theme').value;
-      let theme = themeSel;
-      if (themeSel === 'custom') {
-        theme = {
-          primaryColor: $('thPrimary').value || '#8ab4f8',
-          backgroundColor: $('thBg').value || '#0b1220',
-          font: $('thFont').value || 'system-ui, sans-serif'
-        };
+      // Windows απόλυτο: C:\... ή D:\...
+      if (/^[A-Za-z]:\\/.test(src)) {
+        const forward = src.replace(/\\/g, "/");
+        // προσπαθούμε να αναγνωρίσουμε "/examples/assets/" και να κάνουμε σχετικό path
+        const m = forward.match(/\/examples\/assets\/(.+)$/i) || forward.match(/\/assets\/(.+)$/i);
+        if (m) {
+          return ASSETS_BASE + m[1];
+        }
+        return "file:///" + forward;
       }
 
-      // canvas background
-      const bgKind = $('bgKind').value;
-      let canvasBackground = undefined;
-      if (bgKind === 'color') canvasBackground = { kind: 'color', value: $('bgVal').value || '#0b1220' };
-      if (bgKind === 'image') canvasBackground = { kind: 'image', src: $('bgVal').value || 'YOUR_IMAGE_URL_BG', fit: $('bgFit').value, opacity: Number($('bgOpacity').value || 1) };
-      if (bgKind === 'video') canvasBackground = { kind: 'video', src: $('bgVal').value || 'YOUR_VIDEO_URL_BG', fit: $('bgFit').value, opacity: Number($('bgOpacity').value || 1), loop: true, autoplay: true, muted: true };
+      // Unix-like absolute path: /Users/.../assets/logo.png
+      if (src.startsWith("/")) {
+        const m = src.match(/\/examples\/assets\/(.+)$/i) || src.match(/\/assets\/(.+)$/i);
+        if (m) {
+          return ASSETS_BASE + m[1];
+        }
+        // αφήνουμε ως έχει (Firefox file://)
+        return src;
+      }
 
+      // Σχετικό μονοπάτι (το κρατάμε)
+      return src;
+    }
+
+    /** Κάνει deep clone timeline και νορμαλάρισμα όλων των media paths */
+    function normalizeTimelineMedia(timeline) {
+      const cloned = {
+        ...timeline,
+        items: timeline.items.map(it => {
+          const item = { ...it };
+          if (item.label) {
+            const k = item.label.kind;
+            if (k === "image") {
+              item.label = {
+                ...item.label,
+                src: normalizeSrc(item.label.src),
+              };
+            } else if (k === "video") {
+              item.label = {
+                ...item.label,
+                src: normalizeSrc(item.label.src),
+                poster: item.label.poster ? normalizeSrc(item.label.poster) : undefined,
+                // Firefox/Chromium autoplay heuristics
+                autoplay: item.label.autoplay ?? true,
+                muted: item.label.muted ?? true,
+                loop: item.label.loop ?? true,
+              };
+            }
+          }
+          return item;
+        }),
+      };
+      return cloned;
+    }
+
+    /** Τυλίγει ένα fixture { name, timeline } και επιστρέφει νέο αντικείμενο με normalized timeline */
+    function normalizedFixture(fix) {
       return {
-        theme,
-        mode: 'slider',
-        axisStrategy: axis,
-        cardWidth, cardHeight,
-        enforceUniformCardSize,
-        hideOverlappingLabels,
-        minLabelGap, labelCardGap,
-        labelYOffset,
-        baselineY,
-        mediaObjectFit,
-        canvasBackground,
-        onItemClick: (item, ev) => log(`click: ${item.title}`),
-        onItemHover: (item, ev) => log(`hover: ${item.title}`),
-        onRangeChange: (rng) => log(`range: ${rng[0].toISOString()} → ${rng[1].toISOString()}`)
+        name: fix.name,
+        timeline: normalizeTimelineMedia(fix.timeline),
       };
     }
 
-    // ------------------------------------------------------------------
-    // Render based on selected parser
-    // ------------------------------------------------------------------
-    function getData(kind){
-      if (kind === 'csv') return csvText;
-      if (kind === 'json') return jsonObj;
-      if (kind === 'xml') return xmlText;
-      if (kind === 'tei') return teiText;
+    // -----------------------------
+    // App state & rendering
+    // -----------------------------
+    let current = normalizedFixture(fixtures.mixed); // ξεκινάμε με mixed normalized
+    let axisStrategy = "time";
+
+    const sliderEl   = document.getElementById("slider");
+    const verticalEl = document.getElementById("vertical");
+    const gridEl     = document.getElementById("grid");
+
+    function renderAll() {
+      const base = {
+        axisStrategy,
+        minLabelGap: 60,
+        labelYOffset: -18,
+        cardWidth: 160,
+        cardHeight: 200,
+        hideOverlappingLabels: true,
+        zoom: { minScale: 1, maxScale: 50 },
+        showTooltip: true,
+        canvasBackground: { kind: "color", value: "var(--tl-background-color)" },
+        onItemClick: (item) => console.log("CLICK", item.title),
+        onItemHover: (item) => console.log("HOVER", item.title),
+      };
+
+      sliderEl.innerHTML = "";
+      verticalEl.innerHTML = "";
+      gridEl.innerHTML = "";
+
+      SliderRenderer.render(current.timeline, sliderEl, {
+        ...base,
+        timeTickEveryYears: 2,
+        pointTickStride: 2,
+      });
+
+      VerticalRenderer.render(current.timeline, verticalEl, {
+        ...base,
+        baselineX: 220,
+      });
+
+      GridRenderer.render(current.timeline, gridEl, { ...base });
     }
 
-    async function render(){
-      const kind = $('parser').value;
-      const cfg = buildConfig();
+    // -----------------------------
+    // Controls
+    // -----------------------------
+    document.getElementById("loadSmall").onclick  = () => { current = normalizedFixture(fixtures.small);  renderAll(); };
+    document.getElementById("loadMixed").onclick  = () => { current = normalizedFixture(fixtures.mixed);  renderAll(); };
+    document.getElementById("loadDense").onclick  = () => { current = normalizedFixture(fixtures.dense);  renderAll(); };
+    document.getElementById("modeTime").onclick   = () => { axisStrategy = "time";  renderAll(); };
+    document.getElementById("modePoint").onclick  = () => { axisStrategy = "point"; renderAll(); };
 
-      let tl;
-      if (kind === 'csv') tl = Timeline.fromCSV(getData('csv'));
-      if (kind === 'json') tl = Timeline.fromJSON(getData('json'));
-      if (kind === 'xml') tl = Timeline.fromXML(getData('xml'));
-      if (kind === 'tei') tl = Timeline.fromTEI(getData('tei'));
-
-      tl.config = { ...tl.config, ...cfg };
-      statusEl.textContent = 'Rendering…';
-      try {
-        await tl.render(mount);
-        statusEl.textContent = `OK – ${kind.toUpperCase()} (${tl.items.length} items)`;
-      } catch (e) {
-        statusEl.textContent = 'Error';
-        log(String(e));
-        console.error(e);
-      }
-    }
-
-    document.getElementById('renderBtn').addEventListener('click', render);
-
-    // default render
-    render();
+    renderAll();
   </script>
 </body>
 </html>

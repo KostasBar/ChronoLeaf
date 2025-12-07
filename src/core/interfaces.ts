@@ -62,6 +62,12 @@ export interface ITimelineConfig {
   canvasBackground?: CanvasBackground;
 
   zoom?: { minScale?: number; maxScale?: number; initialScale?: number };
+  /** Time axis: δείξε tick ανά N έτη (π.χ. 5). */
+  timeTickEveryYears?: number;
+
+  /** Point axis: δείξε tick ανά N items (π.χ. 4). */
+  pointTickStride?: number;
+
 }
 
 export type CanvasBackground =

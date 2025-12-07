@@ -2,7 +2,7 @@ export * from './core/interfaces';
 export { Timeline } from './core/timeline';
 
 const GLOBAL_STYLE_ID = 'chrono-leaf-default-themes';
-if (!document.getElementById(GLOBAL_STYLE_ID)) {
+if (typeof document !== 'undefined' && !document.getElementById(GLOBAL_STYLE_ID)) {
   const s = document.createElement('style');
   s.id = GLOBAL_STYLE_ID;
      s.textContent = `
@@ -18,6 +18,10 @@ if (!document.getElementById(GLOBAL_STYLE_ID)) {
        --tl-card-border: rgba(0,0,0,0.15);
        --tl-card-radius: 10px;
        --tl-card-shadow: 0 2px 8px rgba(0,0,0,0.12);
+         --tl-overlay-text-color: #fff;
+  --tl-overlay-text-opacity: 0.72;
+  --tl-overlay-text-weight: 600;
+  --tl-overlay-text-shadow: 0 1px 2px rgba(0,0,0,0.35);
        }
        .tl-theme-dark {
         --tl-primary-color: #8ab4f8;
@@ -30,6 +34,10 @@ if (!document.getElementById(GLOBAL_STYLE_ID)) {
         --tl-card-border: rgba(255,255,255,0.18);
         --tl-card-radius: 10px;
         --tl-card-shadow: 0 2px 10px rgba(0,0,0,0.35);
+          --tl-overlay-text-color: #fff;
+  --tl-overlay-text-opacity: 0.72;
+  --tl-overlay-text-weight: 600;
+  --tl-overlay-text-shadow: 0 1px 2px rgba(0,0,0,0.35);
       }
 
      /* Base container styles */

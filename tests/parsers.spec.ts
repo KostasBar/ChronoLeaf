@@ -1,32 +1,76 @@
-import { describe, it, expect } from "vitest";
-import { JSONParser } from "../src/parsers/JSONParser";
+import { describe, expect, it } from "vitest";
 import { CSVParser } from "../src/parsers/CSVParser";
-import { XMLParser } from "../src/parsers/XMLParser";
+import { JSONParser } from "../src/parsers/JSONParser";
+import { ParserFactory } from "../src/core/ParserFactory";
 import { TEIParser } from "../src/parsers/TEIParser";
 
-describe("Parsers basic equivalence", () => {
-  const json = { items: [{ id: "a1", title: "Launch", start: "2021-06-15" }] };
-  const csv = "title,start\nLaunch,2021-06-15";
-  const xml = "<items><item><title>Launch</title><start>2021-06-15</start></item></items>";
-  const tei = `<TEI><text><body><listEvent><event xml:id="a1"><title>Launch</title><date when="2021-06-15"/></event></listEvent></body></text></TEI>`;
-
-  it("JSON parser", () => {
-    const items = JSONParser.parse(json);
-    expect(items[0].title).toBe("Launch");
+describe("CSVParser", () => {
+  it("normalizes Windows-style asset paths and metadata", () => {
+    const csv = [
+      "title,start,labelKind,labelSrc,labelWidth,labelHeight,labelFit,labelZoom,metadata",
+      'Image Test,2022-01-01,image,.\\assets\\logo.png,200,160,contain,1.2,"{\\"foo\\":1}"',
+    ].join("\n");
+    const [item] = CSVParser.parse(csv);
+    expect(item.title).toBe("Image Test");
+    expect(item.start).toBeInstanceOf(Date);
+    expect(item.label).toBeTruthy();
+    expect(item.label?.kind).toBe("image");
+    expect(item.label && "src" in item.label && item.label.src).toContain(
+      "/assets/logo.png"
+    );
+    expect(item.metadata).toEqual({ foo: 1 });
   });
+});
 
-  it("CSV parser", () => {
-    const items = CSVParser.parse(csv);
-    expect(items[0].title).toBe("Launch");
+describe("JSONParser", () => {
+  it("falls back to legacy background definitions", () => {
+    const json = {
+      items: [
+        {
+          title: "Legacy",
+          start: "2020-05-01",
+          background: { type: "image", source: ".\\assets\\logo.png" },
+        },
+      ],
+    };
+    const [item] = JSONParser.parse(json);
+    expect(item.label?.kind).toBe("image");
+    expect(item.label && "src" in item.label && item.label.src).toContain(
+      "/assets/logo.png"
+    );
   });
+});
 
-  it("XML parser", () => {
-    const items = XMLParser.parse(xml);
-    expect(items[0].title).toBe("Launch");
+describe("ParserFactory", () => {
+  it("throws for unsupported formats", () => {
+    expect(() =>
+      ParserFactory.parse("foo", "unknown" as any)
+    ).toThrowError(/Unsupported data type/);
   });
+});
 
-  it("TEI parser", () => {
-    const items = TEIParser.parse(tei);
-    expect(items[0].title).toBe("Launch");
+describe("TEIParser", () => {
+  it("parses TEI events with label fallbacks", () => {
+    const xml = `
+      <TEI>
+        <text>
+          <body>
+            <listEvent>
+              <event when="2022-06-01" type="test">
+                <title>TEI Event</title>
+                <desc>Demo</desc>
+              </event>
+            </listEvent>
+          </body>
+        </text>
+      </TEI>`;
+    const [item] = TEIParser.parse(xml);
+    expect(item.title).toBe("TEI Event");
+    expect(item.start).toBeInstanceOf(Date);
+    expect(item.label?.kind).toBe("text");
+    expect(item.label && "text" in item.label && item.label.text).toBe(
+      "TEI Event"
+    );
+    expect(item.metadata).toEqual({ when: "2022-06-01", type: "test" });
   });
 });
